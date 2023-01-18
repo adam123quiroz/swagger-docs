@@ -24,6 +24,12 @@ tags:
     externalDocs:
       description: Find out more
       url: 'http://swagger.io'
+  - name: visited-places
+    description: Everything about places you visited
+  - name: likes
+    description: Everything about your posts you liked
+  - name: reviews
+    description: Everything about your posts reviewed
 paths:
   /post:
     get:
@@ -31,7 +37,7 @@ paths:
         - tinder-page
       summary: Finds Posts by service
       description: Multiple status values can be provided with comma separated strings
-      operationId: findPetsByStatus
+      operationId: findPostsByService
       parameters:
         - in: query
           name: service
@@ -60,7 +66,59 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Post'
-
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+      security:
+        - petstore_auth:
+            - 'write:users'
+            - 'read:users'
+  /profile:
+    get:
+      tags:
+        - visited-places
+      summary: Find the places where the user has been
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPlacesVisitedByUser
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The user id to search places visited by user
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: dateLimit
+          schema:
+            type: string
+          description: The date limit of items to show recent visited places
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postVisited:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostVisited'
         '400':
           description: Invalid status value
           content:
@@ -76,10 +134,9 @@ paths:
                       "error": "true",
                     }
 
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
+
+
+# The rest of the examples
     post:
       tags:
         - post
@@ -575,9 +632,9 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
-externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
+
+
+
 components:
   schemas:
     Post:
@@ -587,8 +644,27 @@ components:
           type: string
         title:
           type: string
+        datePosted:
+          type: string
+          format: date-time
         photo:
           $ref: '#/components/schemas/File'
+    PostVisited:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        datePosted:
+          type: string
+          format: date-time
+        dateVisited:
+          type: string
+          format: date-time
+        photo:
+          $ref: '#/components/schemas/File'
+
     File:
       type: object
       properties:
@@ -746,8 +822,8 @@ components:
         implicit:
           authorizationUrl: 'http://petstore.swagger.io/oauth/dialog'
           scopes:
-            'write:pets': modify pets in your account
-            'read:pets': read your pets
+            'write:users': modify users in your account
+            'read:users': read your users
     api_key:
       type: apiKey
       name: api_key
