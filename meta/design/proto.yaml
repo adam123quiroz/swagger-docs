@@ -30,6 +30,9 @@ tags:
     description: Everything about your posts you liked
   - name: reviews
     description: Everything about your posts reviewed
+  - name: plan
+    description: Everything about travel plans
+
 paths:
   /post:
     get:
@@ -134,6 +137,134 @@ paths:
                       "error": "true",
                     }
 
+  /plans:
+    get:
+      tags:
+        - plan
+      summary: Find plans where user wants to travel
+      description: Provide created plans by user in a list of plans 
+      operationId: findPlanByUser
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The user id to search places visited by user
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plansCreated:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlansCreated'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+
+  /plans/places/{planId}:
+    get:
+      tags:
+        - plan
+      summary: Find plans where user wants to travel
+      description: Provide created plans by user in a list of plans 
+      operationId: findPlacesByPlanId
+      parameters:
+        - name: planId
+          in: path
+          description: ID of plan to return all the places that are part of plan
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  placesByPlan:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlacesByPlan'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+
+
+  /user/userInformation/{userId}:
+    get:
+      tags:
+        - plan
+      summary: Find user information by id user
+      description: Provide profile information about an user 
+      operationId: getUserInformation
+      parameters:
+        - name: userId
+          in: path
+          description: Id User to get User information or profile
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userInformation'
+
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
 
 
 # The rest of the examples
@@ -342,37 +473,6 @@ paths:
         - petstore_auth:
             - 'write:pets'
             - 'read:pets'
-  '/pet/{petId}/uploadImage':
-    post:
-      tags:
-        - pet
-      summary: uploads an image
-      operationId: uploadFile
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet to update
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-      requestBody:
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
   /store/inventory:
     get:
       tags:
@@ -664,6 +764,102 @@ components:
           format: date-time
         photo:
           $ref: '#/components/schemas/File'
+
+    PlansCreated:
+      type: object
+      properties:
+        planId:
+          type: string
+        listname:
+          type: string
+        totalPlaces:
+          type: integer
+        departureTime:
+          type: string
+          format: date-time
+        arrivalTime:
+          type: string
+          format: date-time
+        dateVisited:
+          type: string
+          format: date-time
+        photo:
+          $ref: '#/components/schemas/File'
+    
+    PlacesByPlan:
+      type: object
+      properties:
+        placeId:
+          type: string
+        placeName:
+          type: string
+        departureTime:
+          type: string
+          format: date-time
+        arrivalTime:
+          type: string
+          format: date-time
+        city:
+          $ref: '#/components/schemas/City'
+        latitude:
+          type: string
+        longitude:
+          type: string
+        dateVisited:
+          type: string
+          format: date-time
+        addedToPlan:
+          type: boolean
+        photo:
+          $ref: '#/components/schemas/File'
+
+
+    userInformation:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        number:
+          type: string
+        email:
+          type: string
+        likes:
+          type: integer
+        reviews:
+          type: integer
+        bookmarks:
+          type: integer
+        photo:
+          $ref: '#/components/schemas/File'
+
+    Comments:
+      type: object
+      properties:
+        commentId:
+          type: string
+        comment:
+          type: string
+
+    Department:
+      type: object
+      properties:
+        departmentId:
+          type: string
+        name:
+          type: string
+
+    City:
+      type: object
+      properties:
+        CityId:
+          type: string
+        name:
+          type: string
+        Department: 
+          $ref: '#/components/schemas/Department'
+    
 
     File:
       type: object
