@@ -87,7 +87,7 @@ paths:
         - petstore_auth:
             - 'write:users'
             - 'read:users'
-  /profile:
+  /profile/visited:
     get:
       tags:
         - visited-places
@@ -122,6 +122,104 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PostVisited'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+  /profile/likes:
+    get:
+      tags:
+        - likes
+      summary: Find posts liked by user
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPlacesLikedByUser
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The user id to search places liked by user
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: dateLimit
+          schema:
+            type: string
+          description: The date limit of items to show recent liked by user
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postVisited:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostLiked'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+  /profile/reviews:
+    get:
+      tags:
+        - reviews
+      summary: Find the post which the user has reviewed
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPlacesReviewedByUser
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The user id to search places visited by user
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: dateLimit
+          schema:
+            type: string
+          description: The date limit of items to show recent reviewed post by user
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postVisited:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PostReviewed'
         '400':
           description: Invalid status value
           content:
@@ -762,6 +860,38 @@ components:
         dateVisited:
           type: string
           format: date-time
+        photo:
+          $ref: '#/components/schemas/File'
+    PostLiked:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        datePosted:
+          type: string
+          format: date-time
+        dateLiked:
+          type: string
+          format: date-time
+        photo:
+          $ref: '#/components/schemas/File'
+    PostReviewed:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        datePosted:
+          type: string
+          format: date-time
+        dateReviewed:
+          type: string
+          format: date-time
+        review:
+          type: integer
         photo:
           $ref: '#/components/schemas/File'
 
