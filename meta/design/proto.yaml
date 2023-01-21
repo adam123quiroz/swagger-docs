@@ -32,6 +32,8 @@ tags:
     description: Everything about your posts reviewed
   - name: plan
     description: Everything about travel plans
+  - name: category
+    description: Everything about categories
 
 paths:
   /post:
@@ -87,7 +89,166 @@ paths:
         - petstore_auth:
             - 'write:users'
             - 'read:users'
-  /profile/visited:
+  /post/best-rating:
+    get:
+      tags:
+        - category
+      summary: Finds Posts by best rating
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPostsByBestRating
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+      security:
+        - petstore_auth:
+            - 'write:users'
+            - 'read:users'
+  /post/most-visited:
+    get:
+      tags:
+        - category
+      summary: Finds Posts by service
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findPostsByService
+      parameters:
+        - in: query
+          name: service
+          schema:
+            type: string
+          description: The numbers of items to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
+      security:
+        - petstore_auth:
+            - 'write:users'
+            - 'read:users'
+  /post/{postId}/like:
+    post:
+      tags:
+        - category
+      summary: Place an order for a pet
+      operationId: placeOrder'
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: string
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "Post not found",
+                      "error": "true",
+                    }
+  /post/{postId}/bookmark:
+    post:
+      tags:
+        - category
+      summary: Place an order for a pet
+      operationId: placeOrder'
+      parameters:
+        - in: path
+          name: postId
+          schema:
+            type: string
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "Post not found",
+                      "error": "true",
+                    }
+  /profile/post-visited:
     get:
       tags:
         - visited-places
@@ -95,11 +256,6 @@ paths:
       description: Multiple status values can be provided with comma separated strings
       operationId: findPlacesVisitedByUser
       parameters:
-        - in: query
-          name: userId
-          schema:
-            type: integer
-          description: The user id to search places visited by user
         - in: query
           name: offset
           schema:
@@ -118,7 +274,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  postVisited:
+                  posts:
                     type: array
                     items:
                       $ref: '#/components/schemas/PostVisited'
@@ -136,7 +292,7 @@ paths:
                       "message": "List is empty",
                       "error": "true",
                     }
-  /profile/likes:
+  /profile/post-likes:
     get:
       tags:
         - likes
@@ -144,11 +300,6 @@ paths:
       description: Multiple status values can be provided with comma separated strings
       operationId: findPlacesLikedByUser
       parameters:
-        - in: query
-          name: userId
-          schema:
-            type: integer
-          description: The user id to search places liked by user
         - in: query
           name: offset
           schema:
@@ -167,7 +318,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  postVisited:
+                  posts:
                     type: array
                     items:
                       $ref: '#/components/schemas/PostLiked'
@@ -185,7 +336,7 @@ paths:
                       "message": "List is empty",
                       "error": "true",
                     }
-  /profile/reviews:
+  /profile/post-reviews:
     get:
       tags:
         - reviews
@@ -193,11 +344,6 @@ paths:
       description: Multiple status values can be provided with comma separated strings
       operationId: findPlacesReviewedByUser
       parameters:
-        - in: query
-          name: userId
-          schema:
-            type: integer
-          description: The user id to search places visited by user
         - in: query
           name: offset
           schema:
@@ -216,7 +362,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  postVisited:
+                  posts:
                     type: array
                     items:
                       $ref: '#/components/schemas/PostReviewed'
@@ -244,7 +390,7 @@ paths:
       operationId: findPlanByUser
       parameters:
         - in: query
-          name: userId
+          name: limit
           schema:
             type: integer
           description: The user id to search places visited by user
@@ -262,10 +408,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  plansCreated:
+                  plans:
                     type: array
                     items:
-                      $ref: '#/components/schemas/PlansCreated'
+                      $ref: '#/components/schemas/Plan'
         '400':
           description: Invalid status value
           content:
@@ -281,7 +427,7 @@ paths:
                       "error": "true",
                     }
 
-  /plans/places/{planId}:
+  /plans/{planId}:
     get:
       tags:
         - plan
@@ -305,7 +451,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  placesByPlan:
+                  places:
                     type: array
                     items:
                       $ref: '#/components/schemas/PlacesByPlan'
@@ -325,21 +471,13 @@ paths:
                     }
 
 
-  /user/userInformation/{userId}:
+  /user/userInformation:
     get:
       tags:
         - plan
       summary: Find user information by id user
       description: Provide profile information about an user
       operationId: getUserInformation
-      parameters:
-        - name: userId
-          in: path
-          description: Id User to get User information or profile
-          required: true
-          schema:
-            type: integer
-            format: int64
 
       responses:
         '200':
@@ -359,8 +497,8 @@ paths:
                 error:
                   value:
                     {
-                      "code": "400",
-                      "message": "List is empty",
+                      "code": "404",
+                      "message": "User not found",
                       "error": "true",
                     }
 components:
@@ -371,6 +509,8 @@ components:
         id:
           type: string
         title:
+          type: string
+        description:
           type: string
         datePosted:
           type: string
@@ -420,17 +560,22 @@ components:
         dateReviewed:
           type: string
           format: date-time
-        review:
+        rating:
           type: integer
+
         photo:
           $ref: '#/components/schemas/File'
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
 
-    PlansCreated:
+    Plan:
       type: object
       properties:
         planId:
           type: string
-        listname:
+        name:
           type: string
         totalPlaces:
           type: integer
@@ -532,6 +677,18 @@ components:
           type: integer
           format: int64
         contentType:
+          type: string
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        publicationDate:
+          type: integer
+          format: int64
+        publicationTime:
           type: string
 
 
