@@ -427,6 +427,51 @@ paths:
                       "error": "true",
                     }
 
+  /favorite-places:
+    get:
+      tags:
+        - visited-places
+      summary: Get User favorite places 
+      description: Provide favorites places marked by User
+      operationId: favoritePlaces
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The user id to search places visited by user
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  places:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlacesByPlan'
+        '400':
+          description: Invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                error:
+                  value:
+                    {
+                      "code": "400",
+                      "message": "List is empty",
+                      "error": "true",
+                    }
   /plans/{planId}:
     get:
       tags:
